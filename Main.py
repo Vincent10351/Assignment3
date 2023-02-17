@@ -5,56 +5,69 @@ from nltk.corpus import stopwords
 nltk.download('stopwords')
 from nltk.stem import PorterStemmer
 import os, re, json
+import tokenizer
 
 index_file = 'index_file'
 document_count = 0
 stemmer = PorterStemmer()
 stop_words = set(stopwords.words('english'))
 unique_words = set()
+freq_dict = defaultdict(int)  # a dictionary of all tokens and its frequencies
+
+def add_tokens(dict_tokens):                                # adds the tokens from the current page into our global token dictionary
+    for token, c in dict_tokens.items():
+        freq_dict[token] += c
+
+def print_unique_words():
+    with open("report.txt", "a") as f:
+        f.write("unique_words: " + str(len(unique_words)) + "\n")
+        f.write("-------------------------------" + "\n")
+
+def print_document_count():
+    with open("report.txt", "a") as f:
+        f.write("document_count: " + str(document_count)+ "\n")
+        f.write("-------------------------------" + "\n")
 
 def tokenize(soup):
     dict_tokens = defaultdict(int)
     text = soup.get_text()
-    for token in re.split("[^a-zA-Z']+", text.lower()):
-        token = stemmer.stem(token.strip()) # current issue at stemmer, tokens not fully spelled out.
-        if is_valid_token(token):
-            unique_words.add(token)
-            dict_tokens[token] += 1
-    return dict_tokens
-
-def is_valid_token(token):
-    return token not in stop_words and len(token) > 2
+    for token in re.sub("[^a-zA-Z0-9']+", ' ', text.lower()).split():
+        token = stemmer.stem(token.strip()) 
+        unique_words.add(token)
+        dict_tokens[token] += 1
+        return dict_tokens
 
 def parse_files(root):
     global document_count
-    file_token_counts = defaultdict(lambda: defaultdict(int))
+    file_token_counts = defaultdict(lambda: defaultdict(int)) #i don't think we need a defaultdict(int)
     token_files = defaultdict(set)
-    for filename in os.listdir(root):
-        for json_files in os.listdir(os.path.join(root, filename)):
-            with open(os.path.join(root, filename, json_files)) as json_file:
-                if document_count == 1000: # added stop at 1000 documents to create test inverted_index
-                    return file_token_counts, token_files
-                loaded_json = json.load(json_file)
+    for filename in os.listdir(root):                                                             #opens the root directory
+        for json_files in os.listdir(os.path.join(root, filename)):                               #opens each file within the root directory
+            with open(os.path.join(root, filename, json_files)) as json_file:                     #opens each json_file within the sub-directory
+                loaded_json = json.load(json_file)                                                #loads each json_file 
                 content = loaded_json['content']
                 text = BeautifulSoup(content, 'lxml')
 
                 cur_list_tokens = tokenize(text)
-                file_token_counts[filename][json_files] = cur_list_tokens
-                for token in cur_list_tokens.keys():
-                    token_files[token].add(json_files)
+                if cur_list_tokens:
+                    word_frequencies = tokenizer.computeWordFrequencies(cur_list_tokens)
+                    add_tokens(word_frequencies)
+
+
+                # file_token_counts[filename][json_files] = cur_list_tokens      #sets value of dictionary of each json file to the tokenized list
+                # "{www_cs_uci_edu: {0a0056b9.json: {tokens}, 0a77b.json: {tokens}}}"
+                # for token in cur_list_tokens.keys():                           #adds each json file that contain the token
+                #     token_files[token].add(json_files)
+                    #{ 'teacher': {json1, json2, json3, json4}}
+                
+
                 document_count += 1
+    
     return file_token_counts, token_files
 
 file_token_counts, token_files = parse_files('DEV')
 
-with open('inverted_index_test.txt', 'a') as f:
-    f.write(f"Total Documents: '{document_count}'\nTotal Unique Words: '{len(unique_words)}'\n")
-    for filename, files in file_token_counts.items():
-        for file_name, tokens in files.items():
-            for token, count in tokens.items():
-                file_containing_token = file_name
-                f.write(f"Token: '{token}' | Frequency: {count} | Found in file: {file_containing_token}\n")
-
-#Wednesday: All day 
-#Thursday: 6pm - whenever
-#Friday: All day 
+open('report.txt', 'w').close()
+print_unique_words()
+print_document_count()
+tokenizer.print_freq(freq_dict)
