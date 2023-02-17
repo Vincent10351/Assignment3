@@ -4,6 +4,7 @@ import nltk
 from nltk.corpus import stopwords
 nltk.download('stopwords')
 from nltk.stem import PorterStemmer
+from nltk.tokenize import RegexpTokenizer
 import os, re, json
 import tokenizer
 
@@ -11,7 +12,6 @@ index_file = 'index_file'
 document_count = 0
 stemmer = PorterStemmer()
 stop_words = set(stopwords.words('english'))
-unique_words = set()
 freq_dict = defaultdict(int)  # a dictionary of all tokens and its frequencies
 
 def add_tokens(dict_tokens):                                # adds the tokens from the current page into our global token dictionary
@@ -20,7 +20,7 @@ def add_tokens(dict_tokens):                                # adds the tokens fr
 
 def print_unique_words():
     with open("report.txt", "a") as f:
-        f.write("unique_words: " + str(len(unique_words)) + "\n")
+        f.write("unique_words: " + str(len(freq_dict)) + "\n")
         f.write("-------------------------------" + "\n")
 
 def print_document_count():
@@ -29,13 +29,21 @@ def print_document_count():
         f.write("-------------------------------" + "\n")
 
 def tokenize(soup):
+    global num_unique_words
     dict_tokens = defaultdict(int)
     text = soup.get_text()
     for token in re.sub("[^a-zA-Z0-9']+", ' ', text.lower()).split():
+        print (token)
         token = stemmer.stem(token.strip()) 
-        unique_words.add(token)
+        #unique_words.add(token)
+        num_unique_words += 1
         dict_tokens[token] += 1
         return dict_tokens
+
+def nltk_tokenize(text : str):
+    tokenizer = RegexpTokenizer(r'\w+')
+    list_tokens = tokenizer.tokenize(text)                  # tokenizes the file and returns a list of tokens
+    return [stemmer.stem(token.strip()) for token in list_tokens]
 
 def parse_files(root):
     global document_count
@@ -46,9 +54,9 @@ def parse_files(root):
             with open(os.path.join(root, filename, json_files)) as json_file:                     #opens each json_file within the sub-directory
                 loaded_json = json.load(json_file)                                                #loads each json_file 
                 content = loaded_json['content']
-                text = BeautifulSoup(content, 'lxml')
+                soup = BeautifulSoup(content, 'html.parser')
 
-                cur_list_tokens = tokenize(text)
+                cur_list_tokens = nltk_tokenize(soup.get_text())
                 if cur_list_tokens:
                     word_frequencies = tokenizer.computeWordFrequencies(cur_list_tokens)
                     add_tokens(word_frequencies)
@@ -65,8 +73,8 @@ def parse_files(root):
     
     return file_token_counts, token_files
 
-file_token_counts, token_files = parse_files('DEV')
 
+file_token_counts, token_files = parse_files('DEV')
 open('report.txt', 'w').close()
 print_unique_words()
 print_document_count()

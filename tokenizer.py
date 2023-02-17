@@ -46,10 +46,9 @@ def print_freq(freq):
     sorted function has a time complexity of nlogn
     """
     freq = sorted(freq.items(), key=lambda x: (-x[1], x[0]))
-    i_len = min(1000, len(freq))
     
     with open("report.txt", "a") as f:
-        for i in range(i_len):
+        for i in range(len(freq)):
             f.write(freq[i][0] + " => " + str(freq[i][1]) + "\n")
         f.write("-------------------------------" + "\n")
             
