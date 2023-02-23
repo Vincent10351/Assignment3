@@ -9,7 +9,6 @@ from nltk.stem import PorterStemmer
 from nltk.tokenize import RegexpTokenizer
 import os, re, json
 import tokenizer
-from classes import *
 from query import search
 
 """
@@ -99,7 +98,7 @@ def main():
     search('machine learning')
     search('ACM')
     search('master of software engineering')
-    
+    print (document_count)
 if __name__=='__main__':
     main()
 
