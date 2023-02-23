@@ -1,4 +1,4 @@
-from Main import freq_dict, document_count
+from Index import freq_dict, document_count
 
 def print_unique_words():                                          #Prints the number of unique words to report.txt
     with open("report.txt", "a") as f:
