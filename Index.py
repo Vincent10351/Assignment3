@@ -14,18 +14,18 @@ from query import search
 """
 Structure of the Inverted Index
 { 
-    Token : {
-        token_frequency: int
-        document_frequency: int
-        doc_ids: {
+    Token : { 
+        token_frequency: int                             # how many times the token appears in ALL docments 
+        document_frequency: int                          # how many documents does the token appear in
+        doc_ids: {                                       
             id1: {
-                id: int,
-                token_frequency: int,
-                tf_idf: int
+                id: int,                                 #doc ID number
+                term_frequency_in_doc: int,              # how many times the token appears in the document divided by total words in doc
+                tf_idf: int                              # tf * idf, i don't know how to explain
             }
             id2: {
                 id: int,
-                token_frequency: int,
+                term_frequency_in_doc: int,
                 tf_idf: int
             }
     }
