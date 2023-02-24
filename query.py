@@ -12,8 +12,6 @@ def load_dict():
     with open('storage/docID_mappings.json', 'r+') as file:
         docID_dict = json.load(file)
 
-
-
 def search(query):
     
     list_of_list_of_urls = []

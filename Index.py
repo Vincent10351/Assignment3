@@ -71,7 +71,8 @@ def parse_files(root):
     for filename in os.listdir(root):                                                             #opens the root directory
         for json_files in os.listdir(os.path.join(root, filename)):                               #opens each file within the root directory
             with open(os.path.join(root, filename, json_files)) as json_file:                     #opens each json_file within the sub-directory
-                if document_count == 500:
+                if document_count == 10:
+                    print (doc_id_dict)
                     return
                 loaded_json = json.load(json_file)                                      #loads each json_file 
                 content = loaded_json['content']                                        #grabs content from json_file
