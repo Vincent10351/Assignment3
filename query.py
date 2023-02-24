@@ -3,14 +3,19 @@ import json, os
 index = ""
 docID_dict = ""
 
-open('result.txt', 'w').close()
+def load_dict():
+    global index
+    global docID_dict
+    with open('storage/index_mappings.json', 'r+') as file:
+        index = json.load(file)
+    
+    with open('storage/docID_mappings.json', 'r+') as file:
+        docID_dict = json.load(file)
 
-with open('./storage/index_mappings.json') as file:
-    index = json.load(file)
-with open('./storage/docID_mappings.json') as file:
-    docID_dict = json.load(file)
+
 
 def search(query):
+    
     list_of_list_of_urls = []
 
     for q in query.lower().split():                                  #gets all query terms

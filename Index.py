@@ -9,7 +9,7 @@ from nltk.stem import PorterStemmer
 from nltk.tokenize import RegexpTokenizer
 import os, re, json
 import tokenizer
-from query import search
+from query import search, load_dict
 
 """
 Structure of the Inverted Index
@@ -71,7 +71,8 @@ def parse_files(root):
     for filename in os.listdir(root):                                                             #opens the root directory
         for json_files in os.listdir(os.path.join(root, filename)):                               #opens each file within the root directory
             with open(os.path.join(root, filename, json_files)) as json_file:                     #opens each json_file within the sub-directory
-
+                if document_count == 500:
+                    return
                 loaded_json = json.load(json_file)                                      #loads each json_file 
                 content = loaded_json['content']                                        #grabs content from json_file
                 soup = BeautifulSoup(content, 'html.parser')
@@ -85,20 +86,25 @@ def parse_files(root):
                 document_count += 1                                                     #keeps track of how many documents there are
     return 
 
-def main():
+def start():
     parse_files('DEV')
-    calculate_tf_idf_score()                                             #calculate the tf_idf score of ALL tokens in index
+    calculate_tf_idf_score()      
+    open('result.txt', 'w').close()
+    if not os.path.exists('storage'):
+        os.mkdir('storage')
+                                           #calculate the tf_idf score of ALL tokens in index
     with open("storage/docID_mappings.json", "w+") as output_file:       #writes docID mappings to a file
         json.dump(doc_id_dict, output_file, indent = 4)
 
     with open('storage/index_mappings.json', 'w+') as output_file:       #writes the index to a json file
         json.dump(index, output_file, indent = 4)
 
+    load_dict()
     search('cristina lopes')                              #performs the query on these terms
     search('machine learning')
     search('ACM')
     search('master of software engineering')
-    print (document_count)
+
 if __name__=='__main__':
-    main()
+    start()
 
