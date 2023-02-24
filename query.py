@@ -18,8 +18,11 @@ def search(query):
 
     for q in query.lower().split():                                  #gets all query terms
         if (q not in index):             
+            #list_of_list_of_urls.append([])
+            print ('hi')
+            print (q)
+            print (type(q))
             continue
-        
         #sorts all documents that contain the query term by their tf_idf score
         sorted_docs = sorted(list(index[q]['doc_ids'].items()), key = lambda x: x[1]['tf_idf'], reverse=True) 
 
@@ -34,11 +37,15 @@ def search(query):
     resulting_list_of_urls = list_of_list_of_urls[0]
 
     for i in list_of_list_of_urls[1:]:                               #performs the intersection between all the list_of_urls in list_of_list_of_urls
-        resulting_list_of_urls = list(set(resulting_list_of_urls) & set(i)) 
+        resulting_list_of_urls = list(set(resulting_list_of_urls).intersection(set(i)) )
 
-    with open('result.txt', 'a') as file:                            #writes all the docs associated with the query term to result.txt
-        file.write(query + '\n')
-        for doc in resulting_list_of_urls[0:5]:
-            file.write(doc)
+    # with open('result.txt', 'a') as file:                            #writes all the docs associated with the query term to result.txt
+    #     file.write(query + '\n')
+    #     for doc in resulting_list_of_urls[0:5]:
+    #         file.write(doc)
+    #     file.write ('\n')
+    for doc in resulting_list_of_urls[0:5]:
+        print (doc.strip())
+    print ('\n')
 
         
