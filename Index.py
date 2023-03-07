@@ -10,6 +10,13 @@ from nltk.tokenize import RegexpTokenizer
 import os, re, json
 import tokenizer
 from query import search, load_dict
+from flask import Flask, render_template, url_for
+
+
+app = Flask(__name__)
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 """
 Structure of the Inverted Index
@@ -107,5 +114,6 @@ def start():
     search('master of software engineering')
 
 if __name__=='__main__':
-    start()
+    app.run(debug=True)
+    #start()
 
