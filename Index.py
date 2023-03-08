@@ -41,7 +41,6 @@ Structure of the Inverted Index
     }
 }
 """
-
 stop_words = set(stopwords.words('english'))
 stemmer = PorterStemmer()
 
@@ -99,7 +98,7 @@ def parse_files(root):
     for filename in os.listdir(root):                                                             #opens the root directory
         for json_files in os.listdir(os.path.join(root, filename)):                               #opens each file within the root directory
             with open(os.path.join(root, filename, json_files)) as json_file:                     #opens each json_file within the sub-directory
-                if document_count == 10:
+                if document_count == 50:
                                                                                                     #keeps track of how many documents there are
                     mergeIndices()
                     return
@@ -116,21 +115,6 @@ def parse_files(root):
                 document_count += 1
     return 
 
-
-def mergeIndices():
-    partial_index_directory = 'storage/partial'
-    if not os.path.exists('storage/fullIndex'):
-        os.makedirs('storage/fullIndex')
-    merged_data = {}
-    for filename in os.listdir(partial_index_directory):
-        with open(os.path.join(partial_index_directory,filename)) as f:
-            partial_index_data = json.load(f)
-
-        merged_data.update(partial_index_data)
-    with open('storage/fullIndex/merged_data.json','w') as f:
-        json.dump(merged_data,f)
-    return
-
 def load_dict():
     global index
     global doc_ids
@@ -140,7 +124,7 @@ def load_dict():
     with open('storage/docID_mappings.json', 'r+') as file: # loads the docID mappings
         doc_ids = json.load(file)
 
-<<<<<<< HEAD
+
 def mergeIndices():
     partial_index_directory = 'storage/partial'
     if not os.path.exists('storage/fullIndex'):
@@ -156,21 +140,11 @@ def mergeIndices():
     return
 
 
-=======
->>>>>>> 2d439e2fd55b0a75bf5ef9ceadd68cdcc66397db
 def search(query):
     # Tokenize the query
     query_tokens = nltk_tokenize(query.lower())
     # Calculate the tf-idf score for each query token
     query_tf_idf = {}
-<<<<<<< HEAD
-=======
-    with open('storage/fullIndex/merged_data.json', 'r+') as file: # loads the merged_index
-        index = json.load(file)
-    
-    with open('storage/docID_mappings.json', 'r+') as file: # loads the docID mappings
-        doc_ids = json.load(file)
->>>>>>> 2d439e2fd55b0a75bf5ef9ceadd68cdcc66397db
         
     for token in query_tokens:
         if token in index:
@@ -205,16 +179,8 @@ def search(query):
 
     return search_results
 
-<<<<<<< HEAD
-def start(): 
-    if not os.path.exists('storage'):
-        os.mkdir('storage')
-    if not os.path.exists('storage/partial'):
-        os.makedirs('storage/partial')
-    parse_files('DEV')
-    calculate_tf_idf_score()     
-                                           #calculate the tf_idf score of ALL tokens in index
-=======
+
+
 def start():
       
     if not os.path.exists('storage'):
@@ -224,18 +190,13 @@ def start():
     parse_files('DEV')
     calculate_tf_idf_score()
                                                                          #calculate the tf_idf score of ALL tokens in index
->>>>>>> 2d439e2fd55b0a75bf5ef9ceadd68cdcc66397db
     with open("storage/docID_mappings.json", "w+") as output_file:       #writes docID mappings to a file
         json.dump(doc_id_dict, output_file, indent = 4)
 
     with open('storage/index_mappings.json', 'w+') as output_file:       #writes the index to a json file
         json.dump(index, output_file, indent = 4)
-<<<<<<< HEAD
-
-    load_dict()
-=======
     
->>>>>>> 2d439e2fd55b0a75bf5ef9ceadd68cdcc66397db
+    load_dict()
     #search('cristina lopes')                              #performs the query on these terms
     #search('machine learning')
     #search('ACM')
@@ -246,5 +207,3 @@ def start():
 if __name__=='__main__':
     start()
     app.run(debug=True)
-
-
