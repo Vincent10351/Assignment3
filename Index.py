@@ -51,31 +51,33 @@ def add_tokens(dict_tokens, doc_id): # Modified add_tokens to create .json file 
     total_words = sum(dict_tokens.values())
     for token, frequency in dict_tokens.items():
         token_letter = token[0].lower()
-        if not token.isnumeric(): # checks if the token is just a number ex. "1" , "100" , "1000", if so does not add to token file.
-            # Check if a file already exists for this token's first letter
-            filename = f'storage/partial/{token_letter}.json'
-            if not os.path.exists(filename):
-                with open(filename, 'w') as f:
-                    json.dump({}, f)
-            
-            # Open the file for this token's first letter
-            with open(filename, 'r+') as f:
-                data = json.load(f)
+        reg = re.compile(r'[a-z0-9]')
+        if reg.match(token_letter):
+            if not token.isnumeric(): # checks if the token is just a number ex. "1" , "100" , "1000", if so does not add to token file.
+                # Check if a file already exists for this token's first letter
+                filename = f'storage/partial/{token_letter}.json'
+                if not os.path.exists(filename):
+                    with open(filename, 'w') as f:
+                        json.dump({}, f)
                 
-                # If the token is not in the file, add it
-                if token not in data:
-                    data[token] = {'token_frequency': 0, 'document_frequency': 0, 'doc_ids': {}}
-                
-                # Update the token's information in the file
-                data[token]['document_frequency'] += 1
-                data[token]['token_frequency'] += frequency
-                data[token]['doc_ids'][doc_id] = {'id': doc_id, 'term_frequency_in_doc': frequency / total_words, 'tf_idf': 0.0}
-                
-                # Write the updated data back to the file
-                f.seek(0)
-                json.dump(data, f)
-                f.truncate()
-                
+                # Open the file for this token's first letter
+                with open(filename, 'r+') as f:
+                    data = json.load(f)
+                    
+                    # If the token is not in the file, add it
+                    if token not in data:
+                        data[token] = {'token_frequency': 0, 'document_frequency': 0, 'doc_ids': {}}
+                    
+                    # Update the token's information in the file
+                    data[token]['document_frequency'] += 1
+                    data[token]['token_frequency'] += frequency
+                    data[token]['doc_ids'][doc_id] = {'id': doc_id, 'term_frequency_in_doc': frequency / total_words, 'tf_idf': 0.0}
+                    
+                    # Write the updated data back to the file
+                    f.seek(0)
+                    json.dump(data, f)
+                    f.truncate()
+                    
 def nltk_tokenize(text : str):                                  #tokenizes the file and returns a list of tokens
     tokenizer = RegexpTokenizer(r'\w+')
     list_tokens = tokenizer.tokenize(text)                      
@@ -93,7 +95,9 @@ def parse_files(root):
     for filename in os.listdir(root):                                                             #opens the root directory
         for json_files in os.listdir(os.path.join(root, filename)):                               #opens each file within the root directory
             with open(os.path.join(root, filename, json_files)) as json_file:                     #opens each json_file within the sub-directory
-                if document_count == 10:
+                if document_count == 50:
+                                                                                                    #keeps track of how many documents there are
+                    mergeIndices()
                     return
                 loaded_json = json.load(json_file)                                      #loads each json_file 
                 content = loaded_json['content']                                        #grabs content from json_file
@@ -105,8 +109,23 @@ def parse_files(root):
                     add_tokens(word_frequencies, document_count)
 
                 doc_id_dict[document_count] = loaded_json['url']                        #stores mapping of docID to url
-                document_count += 1                                                     #keeps track of how many documents there are
+                document_count += 1
     return 
+
+
+def mergeIndices():
+    partial_index_directory = 'storage/partial'
+    if not os.path.exists('storage/fullIndex'):
+        os.makedirs('storage/fullIndex')
+    merged_data = {}
+    for filename in os.listdir(partial_index_directory):
+        with open(os.path.join(partial_index_directory,filename)) as f:
+            partial_index_data = json.load(f)
+
+        merged_data.update(partial_index_data)
+    with open('storage/fullIndex/merged_data.json','w') as f:
+        json.dump(merged_data,f)
+    return
 
 
 def search(query): # moved and edited into index.py for cosine similarity, comment out if want to use other one.
@@ -144,6 +163,8 @@ def start():
     calculate_tf_idf_score()      
     if not os.path.exists('storage'):
         os.mkdir('storage')
+    if not os.path.exists('storage/partial'):
+        os.mkdir('storage/partial')
                                            #calculate the tf_idf score of ALL tokens in index
     with open("storage/docID_mappings.json", "w+") as output_file:       #writes docID mappings to a file
         json.dump(doc_id_dict, output_file, indent = 4)
@@ -157,7 +178,10 @@ def start():
     search('ACM')
     search('master of software engineering')
 
+
+
 if __name__=='__main__':
+    start()
     app.run(debug=True)
-    #start()
+
 
