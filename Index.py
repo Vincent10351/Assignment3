@@ -47,20 +47,35 @@ doc_id_dict = {}                                                #holds mapping o
 def ind(): return defaultdict(ind)
 index = ind()                                                   # a dictionary of all tokens
 
-def add_tokens(dict_tokens, doc_id):                            # adds the tokens from the doc_id to global index
+def add_tokens(dict_tokens, doc_id): # Modified add_tokens to create .json file for each alphanumeric character. 
     total_words = sum(dict_tokens.values())
     for token, frequency in dict_tokens.items():
-
-        #term_frequency_in_doc is the ratio of how many times the word appears in the doc compared to the total words
-        p = {'id': doc_id, 'term_frequency_in_doc': frequency/total_words, 'tf_idf': 0.0}    
-
-        if token not in index:                                  #if the token does not exist in the index, add the token
-            index[token] = {'token_frequency':0, 'document_frequency': 0, 'doc_ids':{}};    
-
-        index[token]['document_frequency'] += 1                 #Document_frequency is how many documents does this token appear in
-        index[token]['token_frequency'] += frequency            #Token_frequency is the total number of times the token appears OVERALL
-        index[token]['doc_ids'][doc_id] = p                     #Adds a token to index, and creates a Posting object for that doc_id and adds to the doc_ids list
-
+        token_letter = token[0].lower()
+        if not token.isnumeric(): # checks if the token is just a number ex. "1" , "100" , "1000", if so does not add to token file.
+            # Check if a file already exists for this token's first letter
+            filename = f'storage/partial/{token_letter}.json'
+            if not os.path.exists(filename):
+                with open(filename, 'w') as f:
+                    json.dump({}, f)
+            
+            # Open the file for this token's first letter
+            with open(filename, 'r+') as f:
+                data = json.load(f)
+                
+                # If the token is not in the file, add it
+                if token not in data:
+                    data[token] = {'token_frequency': 0, 'document_frequency': 0, 'doc_ids': {}}
+                
+                # Update the token's information in the file
+                data[token]['document_frequency'] += 1
+                data[token]['token_frequency'] += frequency
+                data[token]['doc_ids'][doc_id] = {'id': doc_id, 'term_frequency_in_doc': frequency / total_words, 'tf_idf': 0.0}
+                
+                # Write the updated data back to the file
+                f.seek(0)
+                json.dump(data, f)
+                f.truncate()
+                
 def nltk_tokenize(text : str):                                  #tokenizes the file and returns a list of tokens
     tokenizer = RegexpTokenizer(r'\w+')
     list_tokens = tokenizer.tokenize(text)                      
@@ -79,7 +94,6 @@ def parse_files(root):
         for json_files in os.listdir(os.path.join(root, filename)):                               #opens each file within the root directory
             with open(os.path.join(root, filename, json_files)) as json_file:                     #opens each json_file within the sub-directory
                 if document_count == 10:
-
                     return
                 loaded_json = json.load(json_file)                                      #loads each json_file 
                 content = loaded_json['content']                                        #grabs content from json_file
@@ -94,10 +108,40 @@ def parse_files(root):
                 document_count += 1                                                     #keeps track of how many documents there are
     return 
 
+
+def search(query): # moved and edited into index.py for cosine similarity, comment out if want to use other one.
+    # Tokenize the query
+    query_tokens = nltk_tokenize(query.lower())
+
+    # Calculate the tf-idf score for each query token
+    query_tf_idf = {}
+    for token in query_tokens:
+        if token in index:
+            idf = math.log(document_count / index[token]['document_frequency'], 10)
+            tf = 1 + math.log(query_tokens.count(token), 10)
+            query_tf_idf[token] = tf * idf
+
+    # Calculate the cosine similarity between the query and each document in the posting lists
+    scores = {}
+    for token in query_tokens:
+        if token in index:
+            for doc_id, posting in index[token]['doc_ids'].items():
+                if doc_id not in scores:
+                    scores[doc_id] = 0.0
+                scores[doc_id] += query_tf_idf[token] * posting['tf_idf']
+
+    # Return the top 5 documents with the highest cosine similarity scores
+    top_docs = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:5]
+
+    with open('results.txt', 'a') as file:
+        file.write(f'{query}\n')
+        for doc_id, score in top_docs:
+            file.write(f'{doc_id_dict[doc_id]} {score}\n')
+        file.write('\n')
+
 def start():
     parse_files('DEV')
     calculate_tf_idf_score()      
-    open('result.txt', 'w').close()
     if not os.path.exists('storage'):
         os.mkdir('storage')
                                            #calculate the tf_idf score of ALL tokens in index
