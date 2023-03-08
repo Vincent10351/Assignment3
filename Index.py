@@ -9,14 +9,18 @@ from nltk.stem import PorterStemmer
 from nltk.tokenize import RegexpTokenizer
 import os, re, json
 import tokenizer
-from query import search, load_dict
 from flask import Flask, render_template, url_for
 
 
 app = Flask(__name__)
-@app.route('/')
-def index():
-    return render_template('index.html')
+@app.route('/', methods =['GET','POST'])
+def searchFlask():
+    search_results = list()
+    if request.method == 'POST':
+        query = request.form['query']
+        search_results = search(query)
+    return render_template('index.html',links=search_results)
+
 
 """
 Structure of the Inverted Index
@@ -38,6 +42,7 @@ Structure of the Inverted Index
     }
 }
 """
+
 stop_words = set(stopwords.words('english'))
 stemmer = PorterStemmer()
 
@@ -95,7 +100,7 @@ def parse_files(root):
     for filename in os.listdir(root):                                                             #opens the root directory
         for json_files in os.listdir(os.path.join(root, filename)):                               #opens each file within the root directory
             with open(os.path.join(root, filename, json_files)) as json_file:                     #opens each json_file within the sub-directory
-                if document_count == 50:
+                if document_count == 10:
                                                                                                     #keeps track of how many documents there are
                     mergeIndices()
                     return
@@ -127,13 +132,36 @@ def mergeIndices():
         json.dump(merged_data,f)
     return
 
+def load_dict():
+    global index
+    global doc_ids
+    with open('storage/fullIndex/merged_data.json', 'r+') as file: # loads the merged_index
+        index = json.load(file)
+    
+    with open('storage/docID_mappings.json', 'r+') as file: # loads the docID mappings
+        doc_ids = json.load(file)
 
-def search(query): # moved and edited into index.py for cosine similarity, comment out if want to use other one.
+def mergeIndices():
+    partial_index_directory = 'storage/partial'
+    if not os.path.exists('storage/fullIndex'):
+        os.makedirs('storage/fullIndex')
+    merged_data = {}
+    for filename in os.listdir(partial_index_directory):
+        with open(os.path.join(partial_index_directory,filename)) as f:
+            partial_index_data = json.load(f)
+
+        merged_data.update(partial_index_data)
+    with open('storage/fullIndex/merged_data.json','w') as f:
+        json.dump(merged_data,f)
+    return
+
+
+def search(query):
     # Tokenize the query
     query_tokens = nltk_tokenize(query.lower())
-
     # Calculate the tf-idf score for each query token
     query_tf_idf = {}
+        
     for token in query_tokens:
         if token in index:
             idf = math.log(document_count / index[token]['document_frequency'], 10)
@@ -142,29 +170,38 @@ def search(query): # moved and edited into index.py for cosine similarity, comme
 
     # Calculate the cosine similarity between the query and each document in the posting lists
     scores = {}
+    query_token_count = {}
     for token in query_tokens:
         if token in index:
             for doc_id, posting in index[token]['doc_ids'].items():
                 if doc_id not in scores:
                     scores[doc_id] = 0.0
                 scores[doc_id] += query_tf_idf[token] * posting['tf_idf']
+                if doc_id not in query_token_count:
+                    query_token_count[doc_id] = 0
+                query_token_count[doc_id] += 1
 
-    # Return the top 5 documents with the highest cosine similarity scores
-    top_docs = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:5]
+    # Return the top 5 documents with the highest cosine similarity scores that contain all query tokens
+    top_docs = [(doc_id, score) for doc_id, score in scores.items() if query_token_count[doc_id] == len(query_tokens)]
+    top_docs = sorted(top_docs, key=lambda x: x[1], reverse=True)[:5]
 
+    search_results = list()
     with open('results.txt', 'a') as file:
         file.write(f'{query}\n')
         for doc_id, score in top_docs:
-            file.write(f'{doc_id_dict[doc_id]} {score}\n')
+            file.write(f'{doc_ids[doc_id]}\n')
+            search_results.append(doc_ids[doc_id])
         file.write('\n')
 
-def start():
-    parse_files('DEV')
-    calculate_tf_idf_score()      
+    return search_results
+
+def start(): 
     if not os.path.exists('storage'):
         os.mkdir('storage')
     if not os.path.exists('storage/partial'):
-        os.mkdir('storage/partial')
+        os.makedirs('storage/partial')
+    parse_files('DEV')
+    calculate_tf_idf_score()     
                                            #calculate the tf_idf score of ALL tokens in index
     with open("storage/docID_mappings.json", "w+") as output_file:       #writes docID mappings to a file
         json.dump(doc_id_dict, output_file, indent = 4)
@@ -173,10 +210,10 @@ def start():
         json.dump(index, output_file, indent = 4)
 
     load_dict()
-    search('cristina lopes')                              #performs the query on these terms
-    search('machine learning')
-    search('ACM')
-    search('master of software engineering')
+    #search('cristina lopes')                              #performs the query on these terms
+    #search('machine learning')
+    #search('ACM')
+    #search('master of software engineering')
 
 
 
