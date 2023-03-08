@@ -9,7 +9,7 @@ from nltk.stem import PorterStemmer
 from nltk.tokenize import RegexpTokenizer
 import os, re, json
 import tokenizer
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request
 
 
 app = Flask(__name__)
@@ -20,7 +20,6 @@ def searchFlask():
         query = request.form['query']
         search_results = search(query)
     return render_template('index.html',links=search_results)
-
 
 """
 Structure of the Inverted Index
@@ -141,6 +140,7 @@ def load_dict():
     with open('storage/docID_mappings.json', 'r+') as file: # loads the docID mappings
         doc_ids = json.load(file)
 
+<<<<<<< HEAD
 def mergeIndices():
     partial_index_directory = 'storage/partial'
     if not os.path.exists('storage/fullIndex'):
@@ -156,11 +156,21 @@ def mergeIndices():
     return
 
 
+=======
+>>>>>>> 2d439e2fd55b0a75bf5ef9ceadd68cdcc66397db
 def search(query):
     # Tokenize the query
     query_tokens = nltk_tokenize(query.lower())
     # Calculate the tf-idf score for each query token
     query_tf_idf = {}
+<<<<<<< HEAD
+=======
+    with open('storage/fullIndex/merged_data.json', 'r+') as file: # loads the merged_index
+        index = json.load(file)
+    
+    with open('storage/docID_mappings.json', 'r+') as file: # loads the docID mappings
+        doc_ids = json.load(file)
+>>>>>>> 2d439e2fd55b0a75bf5ef9ceadd68cdcc66397db
         
     for token in query_tokens:
         if token in index:
@@ -195,6 +205,7 @@ def search(query):
 
     return search_results
 
+<<<<<<< HEAD
 def start(): 
     if not os.path.exists('storage'):
         os.mkdir('storage')
@@ -203,13 +214,28 @@ def start():
     parse_files('DEV')
     calculate_tf_idf_score()     
                                            #calculate the tf_idf score of ALL tokens in index
+=======
+def start():
+      
+    if not os.path.exists('storage'):
+        os.mkdir('storage')
+    if not os.path.exists('storage/partial'):
+        os.mkdir('storage/partial')
+    parse_files('DEV')
+    calculate_tf_idf_score()
+                                                                         #calculate the tf_idf score of ALL tokens in index
+>>>>>>> 2d439e2fd55b0a75bf5ef9ceadd68cdcc66397db
     with open("storage/docID_mappings.json", "w+") as output_file:       #writes docID mappings to a file
         json.dump(doc_id_dict, output_file, indent = 4)
 
     with open('storage/index_mappings.json', 'w+') as output_file:       #writes the index to a json file
         json.dump(index, output_file, indent = 4)
+<<<<<<< HEAD
 
     load_dict()
+=======
+    
+>>>>>>> 2d439e2fd55b0a75bf5ef9ceadd68cdcc66397db
     #search('cristina lopes')                              #performs the query on these terms
     #search('machine learning')
     #search('ACM')
