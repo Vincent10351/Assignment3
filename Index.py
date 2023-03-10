@@ -1,5 +1,6 @@
 from collections import defaultdict
 import math
+import sys
 from bs4 import BeautifulSoup
 import numpy as np
 import nltk
@@ -9,18 +10,18 @@ from nltk.stem import PorterStemmer
 from nltk.tokenize import RegexpTokenizer
 import os, re, json
 import tokenizer
-from flask import Flask, render_template, url_for, request
+#from flask import Flask, render_template, url_for, request
 import time
 
 
-app = Flask(__name__)
+"""app = Flask(__name__)
 @app.route('/', methods =['GET','POST'])
 def searchFlask():
     search_results = list()
     if request.method == 'POST':
         query = request.form['query']
         search_results = search(query)
-    return render_template('index.html',links=search_results)
+    return render_template('index.html',links=search_results)"""
 
 """
 Structure of the Inverted Index
@@ -66,39 +67,43 @@ stemmer = PorterStemmer()
 document_count = 0
 doc_id_dict = {}                                                #holds mapping of docID to the url
 
+MAX_INDEX_SIZE = 100 * 1024 * 1024  # 100 MB
+total_index_size = 0
 def ind(): return defaultdict(ind)
 index = ind()                                                   # a dictionary of all tokens
 
+
 def add_tokens(dict_tokens, doc_id):
+    global index
+    global total_index_size
     # Calculate the total number of words in the document
     total_words = sum(dict_tokens.values())
-    
-    # Create an empty dictionary to store file data
-    file_data = {}
-    
+    if total_index_size >= MAX_INDEX_SIZE:
+        dump_index_to_files()
+        total_index_size = 0
     # Loop through each token and its frequency in the document
     for token, frequency in dict_tokens.items():
         # Get the first letter of the token (converted to lowercase)
         token_letter = token[0].lower()
         
         # Check if the first letter is an alphabetic character and the token is not just a number
-        if token_letter.isalpha() and not token.isnumeric():
+        if re.match('[a-z]', token_letter) and not token.isnumeric():
             # Create a filename for the token based on its first letter
             filename = f'storage/partial/{token_letter}.json'
             
             # Check if the file data has already been loaded for this filename
-            if filename not in file_data:
+            if filename not in index:
                 # If the file doesn't exist, create it with an empty dictionary
                 if not os.path.exists(filename):
                     with open(filename, 'w') as f:
                         json.dump({}, f)
                 
-                # Load the existing file data into the file_data dictionary
+                # Load the existing file data into the index dictionary
                 with open(filename, 'r+') as f:
-                    file_data[filename] = json.load(f)
+                    index[filename] = json.load(f)
             
             # Get the data dictionary for this token from the file data
-            data = file_data[filename]
+            data = index[filename]
             
             # If the token is not in the data dictionary, add it with initial values
             if token not in data:
@@ -110,11 +115,26 @@ def add_tokens(dict_tokens, doc_id):
             
             # Add the document ID, term frequency, and TF-IDF values for this token in this document
             data[token]['doc_ids'][doc_id] = {'id': doc_id, 'term_frequency_in_doc': frequency / total_words, 'tf_idf': 0.0}
-    
-    # Write the updated file data back to each file
-    for filename, data in file_data.items():
-        with open(filename, 'w') as f:
+
+                        
+            # Calculate the size of the token and its data in bytes
+            token_size = sys.getsizeof(token)
+            data_size = sys.getsizeof(data[token])
+            
+            # Increment the total size of the index
+            total_index_size += token_size + data_size
+
+
+            
+def dump_index_to_files():
+    print(total_index_size)
+    print("dumping")
+    global index
+    for partial, data in index.items():
+        with open(partial, 'w') as f:
             json.dump(data, f, indent=4)
+    index = {}
+    
                     
 
 def nltk_tokenize(text : str):                                  #tokenizes the file and returns a list of tokens
@@ -132,42 +152,39 @@ def calculate_tf_idf_score():                                   #calculates the 
     with open('storage/fullIndex/merged_data.json','w') as f:
         json.dump(index,f,indent = 4)
 
-# def calculate_importance(soup, doc_id):
-#     for header, base_weight in importance_dict.items():
-#         for tag in soup.find_all(header):   # for each tag that matches header 
-#             content = tag.text              # content of the tag
+def calculate_importance(soup, doc_id):
+    for header, base_weight in importance_dict.items():
+        for tag in soup.find_all(header):   # for each tag that matches header 
+            content = tag.text              # content of the tag
             
-#             #TODO : tokenize contents of tag
-#             tokens_in_tag = nltk_tokenize(content)
-            
-#             # Adds to weight of document according to header
-#             for tag_token in tokens_in_tag: # iterate through token list
-#                 if tag_token in index and doc_id in index[tag_token]['doc_ids']:
-#                     index[tag_token]['doc_ids'][doc_id]['term_frequency_in_doc'] += base_weight   # add weight 
+            #TODO : tokenize contents of tag
+            tokens_in_tag = nltk_tokenize(content)          
+            # Adds to weight of document according to header
+            for tag_token in tokens_in_tag: # iterate through token list
+                if tag_token in index and doc_id in index[tag_token]['doc_ids']:
+                    index[tag_token]['doc_ids'][doc_id]['term_frequency_in_doc'] += base_weight   # add weight 
         
 def parse_files(root):
     global document_count
     for filename in os.listdir(root):                                                             #opens the root directory
         for json_files in os.listdir(os.path.join(root, filename)):                               #opens each file within the root directory
             with open(os.path.join(root, filename, json_files)) as json_file:                     #opens each json_file within the sub-directory
-                if document_count == 20:
-                                                                                                    #keeps track of how many documents there are
+                if document_count == 7000:                       # Remove to run index on full corpus, keep for testing
+                    dump_index_to_files()
                     mergeIndices()
                     return
                 loaded_json = json.load(json_file)                                      #loads each json_file 
                 content = loaded_json['content']                                        #grabs content from json_file
                 soup = BeautifulSoup(content, 'html.parser')
-
                 cur_list_tokens = nltk_tokenize(soup.get_text())
-                if len(cur_list_tokens) > 3000 or len(cur_list_tokens) < 200:           #prune high information or low information pages. Moz 2015 concluded avg webpage has 1891 tokens.
-                    continue
                 if cur_list_tokens:                                                     #computes word frequencies and adds to index
                     word_frequencies = tokenizer.computeWordFrequencies(cur_list_tokens)
                     add_tokens(word_frequencies, document_count)
-                    #calculate_importance(soup, document_count)                          
+                    #calculate_importance(soup, document_count)                        
                 
                 doc_id_dict[document_count] = loaded_json['url']                        #stores mapping of docID to url
                 document_count += 1
+    dump_index_to_files()
     mergeIndices()
 
 def load_dict():
@@ -228,6 +245,19 @@ def search(query):
 
     return search_results
 
+def splity():
+    with open('storage/fullIndex/merged_data.json', 'r') as f:                      # load the inverted index.json file
+        inverted_index = json.load(f)
+    partial_indexes = {}                                                            # create a dictionary to store the partial indexes
+    for token in inverted_index:                                                    # iterate through the tokens in the inverted index
+        first_letter = token[0]                                                     # get the first letter of the token
+        if first_letter not in partial_indexes:                                     # create a new dictionary for the partial index if it doesn't exist yet
+            partial_indexes[first_letter] = {}
+        partial_indexes[first_letter][token] = inverted_index[token]                # add the token information to the partial index
+    for letter in partial_indexes:                                                  # save each partial index to a separate .json file
+        filename = f'storage/partial/{letter}.json'
+        with open(filename, 'w') as f:
+            json.dump(partial_indexes[letter], f, indent = 4)
 
 
 
@@ -238,40 +268,34 @@ def start():
     if not os.path.exists('storage/partial'):
         os.mkdir('storage/partial')
     parse_files('DEV')
-    load_dict()
-    calculate_tf_idf_score()
-                                                                         #calculate the tf_idf score of ALL tokens in index
     with open("storage/docID_mappings.json", "w+") as output_file:       #writes docID mappings to a file
         json.dump(doc_id_dict, output_file, indent = 4)
-
-    with open('storage/index_mappings.json', 'w+') as output_file:       #writes the index to a json file
-        json.dump(index, output_file, indent = 4)
-    
     load_dict()
+    calculate_tf_idf_score()
+    #calculate the tf_idf score of ALL tokens in index
+
     
-    #search('cristina lopes')                              #performs the query on these terms
-    #search('machine learning')
-    #search('ACM')
-    #search('master of software engineering')
-    #search('artificial')
-    #search('connect')
-    #search('algorithm')
-    #search('keong')  
-    #search('koagiri')
-    #search('magnetic field')
-    #search('XML')
-    #search('VR')
-    #search('Virtual RealiTy')
-    #search('UTC')
-    #search('ProfeSSor')
-    #search('Professor cristina lopes')
-    #search('zebra')
-    #search('ICS')
     
 
 
 if __name__=='__main__':
-    start_time = time.time()
     start()
-    print("Indexing 20 Documents took: ",time.time()-start_time)
+    # search('cristina lopes')
+    # search('machine learning')
+    # search('ACM')
+    # search('master of software engineering')
+    # search('artificial')
+    # search('connect')
+    # search('algorithm')
+    # search('keong')  
+    # search('koagiri')
+    # search('magnetic field')
+    # search('XML')
+    # search('VR')
+    # search('Virtual RealiTy')
+    # search('UTC')
+    # search('ProfeSSor')
+    # search('Professor cristina lopes')
+    # search('zebra')
+    # search('ICS')
     #app.run(debug=True)
