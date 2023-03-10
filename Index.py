@@ -29,18 +29,38 @@ Structure of the Inverted Index
         document_frequency: int                          # how many documents does the token appear in
         doc_ids: {                                       
             id1: {
-                id: int,                                 #doc ID number
+                id: int,                                 # doc ID number
                 term_frequency_in_doc: int,              # how many times the token appears in the document divided by total words in doc
                 tf_idf: int                              # tf * idf, i don't know how to explain
+                weight: int                            # weight of this token in this document
             }
             id2: {
                 id: int,
                 term_frequency_in_doc: int,
                 tf_idf: int
+                weight: int
             }
     }
 }
 """
+
+
+importance_dict = \
+{
+    'title': 25,
+    'h1': 10,
+    'h2': 8,
+    'h3': 6,
+    'h4': 5,
+    'b': 3,
+    'strong': 3,
+    'i': 2,
+    'em': 2,
+    'h5': 2,
+    'h6': 2
+}
+
+
 stop_words = set(stopwords.words('english'))
 stemmer = PorterStemmer()
 
@@ -53,10 +73,10 @@ index = ind()                                                   # a dictionary o
 def add_tokens(dict_tokens, doc_id): # Modified add_tokens to create .json file for each alphanumeric character. 
     total_words = sum(dict_tokens.values())
     for token, frequency in dict_tokens.items():
-        token_letter = token[0].lower()
-        reg = re.compile(r'[a-z0-9]')
-        if reg.match(token_letter):
-            if not token.isnumeric(): # checks if the token is just a number ex. "1" , "100" , "1000", if so does not add to token file.
+        token_letter = token[0].lower() # First letter of token lowercase
+        reg = re.compile(r'[a-z0-9]')   
+        if reg.match(token_letter):     # Checks if first letter matches a-z 0-9
+            if not token.isnumeric():   # Checks if the token is just a number ex. "1" , "100" , "1000", if so does not add to token file.
                 # Check if a file already exists for this token's first letter
                 filename = f'storage/partial/{token_letter}.json'
                 if not os.path.exists(filename):
@@ -78,7 +98,7 @@ def add_tokens(dict_tokens, doc_id): # Modified add_tokens to create .json file 
                     
                     # Write the updated data back to the file
                     f.seek(0)
-                    json.dump(data, f)
+                    json.dump(data, f, indent = 2)
                     f.truncate()
                     
 def nltk_tokenize(text : str):                                  #tokenizes the file and returns a list of tokens
@@ -93,12 +113,24 @@ def calculate_tf_idf_score():                                   #calculates the 
             tf = index[token]['doc_ids'][doc_id]['term_frequency_in_doc']
             index[token]['doc_ids'][doc_id]['tf_idf'] = tf * idf
 
+def calculate_importance(soup, doc_id):
+    for header, base_weight in importance_dict.items():
+        for tag in soup.find_all(header):   # for each tag that matches header 
+            content = tag.text              # content of the tag
+            
+            #TODO : tokenize contents of tag
+            tokens_in_tag = nltk_tokenize(content)
+            
+            # Adds to weight of document according to header
+            for tag_token in tokens_in_tag: # iterate through token list
+                index[tag_token]['doc_ids'][doc_id]['term_frequency_in_doc'] += base_weight   # add weight 
+        
 def parse_files(root):
     global document_count
     for filename in os.listdir(root):                                                             #opens the root directory
         for json_files in os.listdir(os.path.join(root, filename)):                               #opens each file within the root directory
             with open(os.path.join(root, filename, json_files)) as json_file:                     #opens each json_file within the sub-directory
-                if document_count == 50:
+                if document_count == 20:
                                                                                                     #keeps track of how many documents there are
                     mergeIndices()
                     return
@@ -107,13 +139,16 @@ def parse_files(root):
                 soup = BeautifulSoup(content, 'html.parser')
 
                 cur_list_tokens = nltk_tokenize(soup.get_text())
+                if len(cur_list_tokens) > 5000 or len(cur_list_tokens) < 200:           #prune high information or low information pages.
+                    continue
                 if cur_list_tokens:                                                     #computes word frequencies and adds to index
                     word_frequencies = tokenizer.computeWordFrequencies(cur_list_tokens)
                     add_tokens(word_frequencies, document_count)
-
+                    calculate_importance(soup, document_count)                          #
+                
                 doc_id_dict[document_count] = loaded_json['url']                        #stores mapping of docID to url
                 document_count += 1
-    return 
+    mergeIndices()
 
 def load_dict():
     global index
@@ -196,7 +231,7 @@ def start():
     with open('storage/index_mappings.json', 'w+') as output_file:       #writes the index to a json file
         json.dump(index, output_file, indent = 4)
     
-    load_dict()
+
     #search('cristina lopes')                              #performs the query on these terms
     #search('machine learning')
     #search('ACM')
@@ -206,4 +241,4 @@ def start():
 
 if __name__=='__main__':
     start()
-    app.run(debug=True)
+    #app.run(debug=True)
