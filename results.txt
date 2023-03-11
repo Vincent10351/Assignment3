@@ -154,3 +154,10 @@ https://www.ics.uci.edu/~sjavanma/
 https://www.informatics.uci.edu/explore/faculty-profiles/cristina-lopes/#content
 https://www.informatics.uci.edu/explore/faculty-profiles/cristina-lopes/
 Total taken: 2104.0 in miliseconds
+machine learning
+http://sli.ics.uci.edu/Classes/Classes
+https://cml.ics.uci.edu/courses/
+https://cml.ics.uci.edu/courses/#content
+https://cbcl.ics.uci.edu/lib/exe/detail.php?id=start&media=p1040962.jpg
+https://cbcl.ics.uci.edu/lib/exe/detail.php?id=start&media=aldrichparkuci.jpg
+Total taken: 1442.64 in miliseconds

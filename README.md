@@ -35,4 +35,4 @@ BeautifulSoup
 3. Once the command has finished running, the index will have been successfully created. To make a query search, click on the link that is provided in the terminal after the completion of *"python3 Index.py"* or alternatively you can copy the link provided and paste it into your web browser.
 
 ## Using the UI
-To use the search engine, we implemented a local web GUI with Flask. The user types in a query into the "Vincenettes Search Engine" and clicks the submit box. Afterwards, the user will receive the top K (5 in this case) links in an unordered list. 
+To use the search engine, we implemented a local web GUI with Flask. The user types in a query into the "Vincenettes Search Engine" and clicks the submit box. Afterwards, the user will receive the top K (5 in this case) links in an unordered list (ul). 
