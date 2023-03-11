@@ -7,14 +7,27 @@ Our search engine gathers data from approximately 56,000 pages from 88 different
 ## Prerequisites and Dependencies
 Python 3.9
 MacOS or Linux
-Flask micro web framework (pip install flask)
-BeautifulSoup (pip install bs4)
+Flask micro web framework
+BeautifulSoup
 
+### First, open your machine's terminal. Then run these commands:
+ pip install python3
+ pip install flask
+ pip install bs4
 
 ## Set up
 1. Download our code from github via cloning the repository and navigate to said directory within your machine's terminal. 
 
+### For Linux:
+ cd /home/user/my_project
+### For macOS:
+ cd /Users/user/my_project
+ git clone https://github.com/Vincent10351/Assignment3.git
+
 2. Set up the index by running python3 Index.py within your terminal. This should take approximately 2 hours to complete
+
+### Run this command to create the index:
+ python3 Index.py
 
 3. (Explain how to run flask/ui portion for search)
 

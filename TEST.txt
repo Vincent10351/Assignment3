@@ -1,0 +1,24 @@
+Well performing queries both before and after optimization:
+1. search('zebra')
+    > There is no results under the token zebra
+2. 
+
+
+search('cristina lopes')
+search('machine learning')
+search('ACM')
+search('master of software engineering')
+search('artificial')
+search('connect')
+search('algorithm')
+search('keong')  
+search('kotagiri') -75
+search('magnetic field')
+search('XML')
+search('VR')
+search('Virtual RealiTy')
+search('UTC')
+search('ProfeSSor')
+search('Professor cristina lopes')
+
+search('ICS')
