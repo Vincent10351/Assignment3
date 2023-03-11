@@ -170,10 +170,6 @@ def parse_files(root):
     for filename in os.listdir(root):                                                             #opens the root directory
         for json_files in os.listdir(os.path.join(root, filename)):                               #opens each file within the root directory
             with open(os.path.join(root, filename, json_files)) as json_file:                     #opens each json_file within the sub-directory
-                if document_count == 7000:                       # Remove to run index on full corpus, keep for testing
-                    dump_index_to_files()
-                    mergeIndices()
-                    return
                 loaded_json = json.load(json_file)                                      #loads each json_file 
                 content = loaded_json['content']                                        #grabs content from json_file
                 soup = BeautifulSoup(content, 'html.parser')
@@ -187,6 +183,7 @@ def parse_files(root):
                 document_count += 1
     dump_index_to_files()
     mergeIndices()
+    return
 
 def load_dict():
     global index
