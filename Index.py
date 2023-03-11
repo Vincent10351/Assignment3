@@ -10,18 +10,18 @@ from nltk.stem import PorterStemmer
 from nltk.tokenize import RegexpTokenizer
 import os, re, json
 import tokenizer
-#from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request
 import time
 
 
-"""app = Flask(__name__)
+app = Flask(__name__)
 @app.route('/', methods =['GET','POST'])
 def searchFlask():
     search_results = list()
     if request.method == 'POST':
         query = request.form['query']
         search_results = search(query)
-    return render_template('index.html',links=search_results)"""
+    return render_template('index.html',links=search_results)
 
 """
 Structure of the Inverted Index
@@ -318,7 +318,7 @@ if __name__=='__main__':
     # start()
     with open('storage/docID_mappings.json', 'r') as f:                      # load the docID_mapping index.json file
         doc_ids = json.load(f)
-    
+    '''
     # Easy Queries
     search('terrible')
     search('KOAGIRI')
@@ -343,3 +343,5 @@ if __name__=='__main__':
     search('ICS')
     search('VR')
     search('Virtual Reality')
+    '''
+    app.run(debug=True)

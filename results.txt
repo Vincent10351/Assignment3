@@ -131,3 +131,26 @@ https://ngs.ics.uci.edu/tag/virtual-reality/
 https://ngs.ics.uci.edu/real-reality/
 https://www.ics.uci.edu/~majumder/
 Total taken: 1277.85 in miliseconds
+machine learning
+http://sli.ics.uci.edu/Classes/Classes
+https://cml.ics.uci.edu/courses/
+https://cml.ics.uci.edu/courses/#content
+https://cbcl.ics.uci.edu/lib/exe/detail.php?id=start&media=p1040962.jpg
+https://cbcl.ics.uci.edu/lib/exe/detail.php?id=start&media=aldrichparkuci.jpg
+Total taken: 1582.0 in miliseconds
+Professor
+http://cert.ics.uci.edu/people.html
+https://www.ics.uci.edu/~theory/
+https://www.ics.uci.edu/~magda/Courses/ics156/Ch4_files/slide0001.htm
+https://www.ics.uci.edu/~magda/Courses/ics156/Ch1_files/slide0001.htm
+https://www.ics.uci.edu/~magda/Courses/ics156/Ch2_files/slide0001.htm
+Total taken: 1266.0 in miliseconds
+Koagiri
+Total taken: 141.0 in miliseconds
+Cristina Lopes
+https://www.ics.uci.edu/~hsajnani/
+http://mondego.ics.uci.edu/
+https://www.ics.uci.edu/~sjavanma/
+https://www.informatics.uci.edu/explore/faculty-profiles/cristina-lopes/#content
+https://www.informatics.uci.edu/explore/faculty-profiles/cristina-lopes/
+Total taken: 2104.0 in miliseconds
