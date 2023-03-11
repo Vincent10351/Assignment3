@@ -1,24 +1,70 @@
+QUERY EXPLANATIONS
+
 Well performing queries both before and after optimization:
-1. search('zebra')
-    > There is no results under the token zebra
-2. 
+1.  Tokens that don't exist within our index should return no link(s)
+    before and after optimization. 
+
+    > search('terrible')    has 0 token_frequency
+    > search('KOAGIRI')     has 0 token_frequency
+
+2.  Queries containing a token that has less than or equal to 5 documents
+    should remain largely the same in results before and after optimization.
+    There may be minimal changes to the order by which the documents are 
+    returned after the implementation of different importance weights and
+    rankings.
+
+    > search('keong')       has 1 token_frequency
+    > search('sunstar')     has 4 token_frequency
+    > search('artificial')  has 1 token_frequency
+    > search('autopilot')   has 5 token_frequency
+
+3.  Queries with tokens that have different letters capitalized should 
+    return the same results regardless of optimization and changes. 
+    There may be some differences between the 2 results prior to optimization
+    /ranking and the 2 results after the implementation, however the results
+    for the 2 queries should be the same every time we run the query.
+    (independent of whether it is prior to optimization or after)
+
+    > search('UTC')         has 134 token_frequency
+    > search('uTc')         has 134 token_frequency
+    > search('KOTAgiri')    has 75 token_frequency
+    > search('kotaGIRI')    has 75 token_frequency
 
 
-search('cristina lopes')
-search('machine learning')
-search('ACM')
-search('master of software engineering')
-search('artificial')
-search('connect')
-search('algorithm')
-search('keong')  
-search('kotagiri') -75
-search('magnetic field')
-search('XML')
-search('VR')
-search('Virtual RealiTy')
-search('UTC')
-search('ProfeSSor')
-search('Professor cristina lopes')
+Queries that improved significantly after optimization:
+1.  Queries that have over 10k token_frequency count. These queries 
+    originally returned the top 5 documents ranked by tf-idf score
+    in which contain the token from the index. The query time for these
+    cases were well over 300ms before optimization, and returned results with
+    decent relevance with our old tf-idf implementation. With the implementation 
+    of optimization, importance, and relevance ranking, our results 
+    return the top 5 documents in which contain the highest relevance 
+    score to the query with consideration towards important headers and 
+    with faster query results.
 
-search('ICS')
+    > search('algorithm')   has 19694 token_frequency
+    > search('ACM')         has 18560 token_frequency
+    > search('XML')         has 27395 token_frequency 
+    > search('professor')   has 10844 token_frequency
+
+2.  Queries with multiple tokens would originally return results that didn't reflect
+    accurate relevance sorting. With the recent changes, we created a way to return the 
+    top 5 most relevant documents containing all tokens in the query. If there is a 
+    particular query that has one token with no resulting documents, and another with 
+    resulting documents, then our results will return the relevant documents according 
+    to the token with existing documents. 
+
+    > search('Terrible UTC')        has 134 token_frequency
+    > search('professor koagiri')   has 10844 token_frequency
+    > search('terrible sunstar')    has 4 token_frequency
+    > search('Machine Learning') 
+    > search('Professor cristina lopes')
+
+3.  These queries have tokens that contain documents with headers and tags that
+    we originally did not account for. With the implementation of importance ranking,
+    our results now reflect the respective weights of each importance header when parsing
+    through the documents. 
+
+    > search('ICS')             has 718 token_frequency
+    > search('VR')              has 489 token_frequency
+    > search('Virtual Reality')

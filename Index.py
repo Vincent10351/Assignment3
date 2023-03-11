@@ -72,6 +72,7 @@ total_index_size = 0
 def ind(): return defaultdict(ind)
 index = ind()                                                   # a dictionary of all tokens
 
+    
 
 def add_tokens(dict_tokens, doc_id):
     global index
@@ -210,24 +211,33 @@ def mergeIndices():
     with open('storage/fullIndex/merged_data.json','w') as f:
         json.dump(merged_data,f)
 
+def get_token_position(token, file_path):
+    with open(file_path, 'r') as f:
+        while True:
+            line = f.readline()
+            if not line:
+                # end of file, token not found
+                return -1
+            if token in line:
+                # token found, return current file position
+                return f.tell()
 
 def search(query):
     print (query)
-    starttime = time.time()
+    start_time = time.time()
     # Tokenize the query
     query_tokens = nltk_tokenize(query.lower())
     # Calculate the tf-idf score for each query token
         
 
     # Calculate the cosine similarity between the query and each document in the posting lists
-    total_start_time = time.time()
     scores = {}
     query_token_count = {}
+    start_time = time.time()
     for token in query_tokens:
-        start_time = time.time()
-        with open('storage/partial/' + f'{token[0]}.json') as f:             #loads partial index belonging to the first letter of token
-            load_partial_index = json.load(f)                        
-        print (f'load_time: {time.time() - start_time}' )
+        with open('storage/partial/' + f'{token[0]}.json') as f:
+            load_partial_index = json.load(f)
+        print(f'load_time: {time.time() - start_time}' )
         query_time = time.time()
         if token in load_partial_index:
             for doc_id, posting in load_partial_index[token]['doc_ids'].items():
@@ -237,14 +247,24 @@ def search(query):
                 if doc_id not in query_token_count:
                     query_token_count[doc_id] = 0
                 query_token_count[doc_id] += 1
-        print (f'query_time: {time.time() - query_time}')
+    print (f'query_time: {round((time.time() - query_time) * 1000, 2)}')
         
             
     sort_time = time.time()
+    scores2 = sorted(scores.items(), key=lambda x: x[1], reverse = True)
     # Return the top 5 documents with the highest cosine similarity scores that contain all query tokens
     top_docs = [(doc_id, score) for doc_id, score in scores.items() if query_token_count[doc_id] == len(query_tokens)] # top all docs that contain christina lopes
+    # If the query term contains a token that does not exist in our index, we return the top 5 documents with the highest cosine similarity score for each word.
+    while len(top_docs) < 5:
+        docs = [doc[0] for doc in top_docs]   #retrieves all the docIDS in top_docs
+        for doc_id, score in scores2:         
+            if doc_id not in docs:            #if the current doc_id in scores2 HASN"T been added to top_docs, add it
+                top_docs.append((doc_id, score))
+            if len(top_docs) == 5:             #once it reaches 5 documents, break
+                break
+        break                                  #if it reaches the end of scores but top_docs is still length < 5, break
     top_docs = sorted(top_docs, key=lambda x: x[1], reverse=True)[:5]
-    print (f'sort_time: {time.time() - sort_time}')
+    print (f'sort_time: {round((time.time() - sort_time) * 1000, 2)}')
 
     write_time = time.time()
     search_results = list()
@@ -253,11 +273,10 @@ def search(query):
         for doc_id, score in top_docs:
             file.write(f'{doc_ids[doc_id]}\n')
             search_results.append(doc_ids[doc_id])
-        totaltime = round((time.time() - starttime) * 1000, 2)
-        file.write(f'Time Taken {totaltime} in miliseconds\n')
+        file.write(f'Total taken: {round((time.time() - start_time) * 1000, 2)} in miliseconds')
         file.write('\n')
-    print (f'write_time: {time.time() - write_time}')
-    print (f'total_start_time: {time.time() - total_start_time}')
+    print (f'write_time: {round((time.time() - write_time) * 1000, 2)}')
+    print (f'total_start_time: {round((time.time() - start_time) * 1000, 2)}')
     print ('----')
     return search_results
 
@@ -296,25 +315,31 @@ def start():
 
 
 if __name__=='__main__':
-    start()
+    # start()
     with open('storage/docID_mappings.json', 'r') as f:                      # load the docID_mapping index.json file
         doc_ids = json.load(f)
-    search('cristina lopes')
-    search('machine learning')
-    search('ACM')
-    search('master of software engineering')
+    
+    # Easy Queries
+    search('terrible')
+    search('KOAGIRI')
+    search('keong')
+    search('sunstar')
     search('artificial')
-    search('connect')
-    search('algorithm')
-    search('keong')  
-    search('koagiri')
-    search('magnetic field')
-    search('XML')
-    search('VR')
-    search('Virtual RealiTy')
+    search('autopilot')
     search('UTC')
-    search('ProfeSSor')
+    search('KOTAgiri')
+    search('kotaGIRI')
+    
+    # Difficult Queries
+    search('algorithm')
+    search('ACM')
+    search('XML')
+    search('professor')
+    search('Terrible UTC')
+    search('professor koagiri')
+    search('terrible sunstar')
+    search('Machine Learning') 
     search('Professor cristina lopes')
-    search('zebra')
     search('ICS')
-    #app.run(debug=True)
+    search('VR')
+    search('Virtual Reality')

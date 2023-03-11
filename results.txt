@@ -1,42 +1,133 @@
-cristina lopes
-Time Taken 12.52 in miliseconds
-
-cristina lopes
-Time Taken 4.45 in miliseconds
-
-cristina lopes
-Time Taken 4.59 in miliseconds
-
-cristina lopes
-Time Taken 5.09 in miliseconds
-
-cristina lopes
-Time Taken 5.07 in miliseconds
-
-cristina lopes
-Time Taken 4.68 in miliseconds
-
-cristina lopes
-Time Taken 5.32 in miliseconds
-
-cristina lopes
-Time Taken 5.05 in miliseconds
-
-machine learning
-Time Taken 7.21 in miliseconds
-
+terrible
+https://ngs.ics.uci.edu/terrible-state-of-search-engines/
+https://www.ics.uci.edu/~theory/269/971121.html
+https://www.ics.uci.edu/~kgajulap/
+http://archive.ics.uci.edu/ml/datasets/Travel+Reviews
+https://ngs.ics.uci.edu/category/entrepreneurism/page/23/
+Total taken: 1405.77 in miliseconds
+KOAGIRI
+Total taken: 195.52 in miliseconds
+keong
+http://archive.ics.uci.edu/ml/datasets/Dynamic+Features+of+VirusShare+Executables
+Total taken: 243.51 in miliseconds
+sunstar
+http://archive.ics.uci.edu/ml/datasets/Flags
+https://www.ics.uci.edu/~kay/wordlist.txt
+Total taken: 2132.76 in miliseconds
+artificial
+https://www.ics.uci.edu/~kkask/courses.html
+https://www.ics.uci.edu/~kobsa/courses/ICS104/course-notes/contr-disciplines.htm
+https://www.ics.uci.edu/~kkask/index.html
+https://www.ics.uci.edu/~kkask/
+https://www.ics.uci.edu/~dechter/courses/ics-171/fall-06/
+Total taken: 1555.59 in miliseconds
+autopilot
+http://alderis.ics.uci.edu/downloads.html
+https://www.ics.uci.edu/~mjcarey/MJCarey_Publications.html
+https://www.ics.uci.edu/~kay/wordlist.txt
+Total taken: 1682.76 in miliseconds
+UTC
+https://www.cs.uci.edu/event/elizabeth-belding/?ical=1
+https://www.cs.uci.edu/event/eyal-de-lara/?ical=1
+https://www.cs.uci.edu/event/c-mohan/?ical=1
+http://archive.ics.uci.edu/ml/datasets/SML2010
+https://grape.ics.uci.edu/wiki/public/prefs/datetime
+Total taken: 582.18 in miliseconds
+KOTAgiri
+http://archive.ics.uci.edu/ml/datasets/Solar+Flare
+http://archive.ics.uci.edu/ml/support/Solar+Flare#48d6beec2a36a87d9d88b6de85dd85a75e5ed24d
+http://archive.ics.uci.edu/ml/datasets/Chess+(King-Rook+vs.+King-Pawn)
+http://archive.ics.uci.edu/ml/datasets/Chess+%28King-Rook+vs.+King-Pawn%29
+http://archive.ics.uci.edu/ml/datasets/Chess+%28King-Rook+vs.+King-Knight%29
+Total taken: 177.06 in miliseconds
+kotaGIRI
+http://archive.ics.uci.edu/ml/datasets/Solar+Flare
+http://archive.ics.uci.edu/ml/support/Solar+Flare#48d6beec2a36a87d9d88b6de85dd85a75e5ed24d
+http://archive.ics.uci.edu/ml/datasets/Chess+(King-Rook+vs.+King-Pawn)
+http://archive.ics.uci.edu/ml/datasets/Chess+%28King-Rook+vs.+King-Pawn%29
+http://archive.ics.uci.edu/ml/datasets/Chess+%28King-Rook+vs.+King-Knight%29
+Total taken: 302.9 in miliseconds
+algorithm
+https://www.ics.uci.edu/~pazzani/Slides/BSEJ/sld018.htm
+https://www.ics.uci.edu/~pazzani/Slides/BSEJ/tsld018.htm
+https://www.ics.uci.edu/~eppstein/161/exams/
+https://www.ics.uci.edu/~theory/269/120127.html
+https://www.ics.uci.edu/~eppstein/161/w96.html
+Total taken: 1648.42 in miliseconds
 ACM
-cristina lopes
-Time Taken 5.21 in miliseconds
-
-machine learning
-Time Taken 4.11 in miliseconds
-
-ACM
-cristina lopes
-Time Taken 5.07 in miliseconds
-
-machine learning
-Time Taken 4.08 in miliseconds
-
-ACM
+https://www.ics.uci.edu/~ardalan/services.html
+https://www.ics.uci.edu/~dutt/services.htm
+https://www.ics.uci.edu/~dvk/CV/cv.html
+https://www.ics.uci.edu/~tujohnso/
+https://www.ics.uci.edu/~mjcarey/MJCarey_Professional_Activities.html
+Total taken: 1611.21 in miliseconds
+XML
+https://www.ics.uci.edu/~ejw/authoring/oslo/advcol_files/slide0009.htm
+https://www.ics.uci.edu/~ejw/authoring/oslo/advcol_files/v3_slide0009.htm
+https://www.ics.uci.edu/~ejw/authoring/oslo/advcol_files/v3_slide0011.htm
+https://www.ics.uci.edu/~ejw/authoring/oslo/advcol_files/slide0011.htm
+https://www.ics.uci.edu/~ejw/authoring/orem/properties/sld011.htm
+Total taken: 35.87 in miliseconds
+professor
+http://cert.ics.uci.edu/people.html
+https://www.ics.uci.edu/~theory/
+https://www.ics.uci.edu/~magda/Courses/ics156/Ch4_files/slide0001.htm
+https://www.ics.uci.edu/~magda/Courses/ics156/Ch1_files/slide0001.htm
+https://www.ics.uci.edu/~magda/Courses/ics156/Ch2_files/slide0001.htm
+Total taken: 1527.51 in miliseconds
+Terrible UTC
+https://www.cs.uci.edu/event/elizabeth-belding/?ical=1
+https://www.cs.uci.edu/event/eyal-de-lara/?ical=1
+https://www.cs.uci.edu/event/c-mohan/?ical=1
+https://ngs.ics.uci.edu/terrible-state-of-search-engines/
+https://www.ics.uci.edu/~theory/269/971121.html
+Total taken: 1884.6 in miliseconds
+professor koagiri
+http://cert.ics.uci.edu/people.html
+https://www.ics.uci.edu/~theory/
+https://www.ics.uci.edu/~magda/Courses/ics156/Ch4_files/slide0001.htm
+https://www.ics.uci.edu/~magda/Courses/ics156/Ch1_files/slide0001.htm
+https://www.ics.uci.edu/~magda/Courses/ics156/Ch2_files/slide0001.htm
+Total taken: 1904.42 in miliseconds
+terrible sunstar
+https://ngs.ics.uci.edu/terrible-state-of-search-engines/
+https://www.ics.uci.edu/~theory/269/971121.html
+https://www.ics.uci.edu/~kgajulap/
+http://archive.ics.uci.edu/ml/datasets/Travel+Reviews
+https://www.ics.uci.edu/~kay/wordlist.txt
+Total taken: 3537.09 in miliseconds
+Machine Learning
+http://sli.ics.uci.edu/Classes/Classes
+https://cml.ics.uci.edu/courses/
+https://cml.ics.uci.edu/courses/#content
+https://cbcl.ics.uci.edu/lib/exe/detail.php?id=start&media=p1040962.jpg
+https://cbcl.ics.uci.edu/lib/exe/detail.php?id=start&media=aldrichparkuci.jpg
+Total taken: 2051.48 in miliseconds
+Professor cristina lopes
+https://www.informatics.uci.edu/very-top-footer-menu-items/people/
+https://www.informatics.uci.edu/very-top-footer-menu-items/people/#Affiliated
+https://www.ics.uci.edu/faculty/faculty_dept?department=Informatics
+https://www.ics.uci.edu/faculty/?department=Informatics
+https://www.ics.uci.edu/faculty/index.php?department=Informatics
+Total taken: 4398.43 in miliseconds
+ICS
+https://www.ics.uci.edu/~irani/f13-6B/6B
+https://www.ics.uci.edu/~irani/f15-6B/6B
+https://www.ics.uci.edu/~irani/s16-6D/6D
+https://www.ics.uci.edu/~irani/f16_6D/6D
+https://www.ics.uci.edu/~irani/w17-6D/6D
+Total taken: 1159.37 in miliseconds
+VR
+https://hack.ics.uci.edu/2016/05/18/arvr-workshop-with-unity-gallery/
+https://hack.ics.uci.edu/2016/05/18/arvr-workshop-with-unity-gallery/#respond
+https://www.ics.uci.edu/~majumder/VRcourse.htm
+https://www.ics.uci.edu/community/news/view_news?id=1303
+https://www.ics.uci.edu/community/news/view_news.php?id=1303
+Total taken: 400.39 in miliseconds
+Virtual Reality
+https://www.ics.uci.edu/~kobsa/courses/ICS104/course-notes/1stlevelheaders/special-applications-hci.htm
+https://www.ics.uci.edu/~kobsa/courses/ICS104/course-notes/vr.htm
+https://ngs.ics.uci.edu/tag/virtual-reality/
+https://ngs.ics.uci.edu/real-reality/
+https://www.ics.uci.edu/~majumder/
+Total taken: 1277.85 in miliseconds
