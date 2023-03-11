@@ -181,7 +181,7 @@ def parse_files(root):
                 if cur_list_tokens:                                                     #computes word frequencies and adds to index
                     word_frequencies = tokenizer.computeWordFrequencies(cur_list_tokens)
                     add_tokens(word_frequencies, document_count)
-                    #calculate_importance(soup, document_count)                        
+                                          
                 
                 doc_id_dict[document_count] = loaded_json['url']                        #stores mapping of docID to url
                 document_count += 1
@@ -198,7 +198,7 @@ def load_dict():
         doc_ids = json.load(file)
 
 
-def mergeIndices():
+def mergeIndices():                                  #merges all json file into merged_data.json
     partial_index_directory = 'storage/partial'
     if not os.path.exists('storage/fullIndex'):
         os.makedirs('storage/fullIndex')
@@ -211,43 +211,31 @@ def mergeIndices():
     with open('storage/fullIndex/merged_data.json','w') as f:
         json.dump(merged_data,f)
 
-def get_token_position(token, file_path):
-    with open(file_path, 'r') as f:
-        while True:
-            line = f.readline()
-            if not line:
-                # end of file, token not found
-                return -1
-            if token in line:
-                # token found, return current file position
-                return f.tell()
 
 def search(query):
     print (query)
     start_time = time.time()
     # Tokenize the query
     query_tokens = nltk_tokenize(query.lower())
-    # Calculate the tf-idf score for each query token
-        
-
-    # Calculate the cosine similarity between the query and each document in the posting lists
+    # Create an empty dictionary to store scores
     scores = {}
+    # Create an empty dictionary to keep track of the number of times each query token appears in a document
     query_token_count = {}
-    start_time = time.time()
-    for token in query_tokens:
+    start_time = time.time()        # Store the current time in a variable
+    for token in query_tokens:      # Loop through each token in the query_tokens list
         with open('storage/partial/' + f'{token[0]}.json') as f:
-            load_partial_index = json.load(f)
-        print(f'load_time: {time.time() - start_time}' )
-        query_time = time.time()
-        if token in load_partial_index:
-            for doc_id, posting in load_partial_index[token]['doc_ids'].items():
-                if doc_id not in scores:
+            load_partial_index = json.load(f)           # Load the contents of the JSON file into a dictionary
+        print(f'load_time: {time.time() - start_time}')         # Print the time it took to load the partial index
+        query_time = time.time()        # Store the current time in a variable
+        if token in load_partial_index:  # Check if the current token exists in the partial index
+            for doc_id, posting in load_partial_index[token]['doc_ids'].items(): # Loop through each document ID and posting for the current token
+                if doc_id not in scores:    # If the document ID is not already in the scores dictionary, add it with a score of 0.0
                     scores[doc_id] = 0.0
-                scores[doc_id] += load_partial_index[token]['doc_ids'][doc_id]['tf_idf'] * posting['tf_idf']
-                if doc_id not in query_token_count:
+                scores[doc_id] += load_partial_index[token]['doc_ids'][doc_id]['tf_idf'] * posting['tf_idf'] # Add the product of the token's and posting's TF-IDF values to the document's score
+                if doc_id not in query_token_count:     # If the document ID is not already in the query_token_count dictionary, add it with a count of 0
                     query_token_count[doc_id] = 0
-                query_token_count[doc_id] += 1
-    print (f'query_time: {round((time.time() - query_time) * 1000, 2)}')
+                query_token_count[doc_id] += 1      # Increment the count of how many times the current token appears in the current document
+    print (f'query_time: {round((time.time() - query_time) * 1000, 2)}') # Print the time it took to process the query
         
             
     sort_time = time.time()
@@ -268,7 +256,7 @@ def search(query):
 
     write_time = time.time()
     search_results = list()
-    with open('results.txt', 'a') as file:
+    with open('results.txt', 'a') as file:                                              #writes to result.txt
         file.write(f'{query}\n')
         for doc_id, score in top_docs:
             file.write(f'{doc_ids[doc_id]}\n')
@@ -297,51 +285,21 @@ def splity():
 
 
 def start():
-      
-    # if not os.path.exists('storage'):
-    #     os.mkdir('storage')
-    # if not os.path.exists('storage/partial'):
-    #     os.mkdir('storage/partial')
-    #parse_files('DEV')
-    # with open("storage/docID_mappings.json", "w+") as output_file:       #writes docID mappings to a file
-    #     json.dump(doc_id_dict, output_file, indent = 4)
-    #load_dict()
-    # calculate_tf_idf_score()
+    if not os.path.exists('storage'):
+        os.mkdir('storage')
+    if not os.path.exists('storage/partial'):
+        os.mkdir('storage/partial')
+    parse_files('DEV')
+    with open("storage/docID_mappings.json", "w+") as output_file:       #writes docID mappings to a file
+        json.dump(doc_id_dict, output_file, indent = 4)
+    load_dict()
+    calculate_tf_idf_score()
     #calculate the tf_idf score of ALL tokens in index
-    pass
 
     
     
 
 
 if __name__=='__main__':
-    # start()
-    with open('storage/docID_mappings.json', 'r') as f:                      # load the docID_mapping index.json file
-        doc_ids = json.load(f)
-    '''
-    # Easy Queries
-    search('terrible')
-    search('KOAGIRI')
-    search('keong')
-    search('sunstar')
-    search('artificial')
-    search('autopilot')
-    search('UTC')
-    search('KOTAgiri')
-    search('kotaGIRI')
-    
-    # Difficult Queries
-    search('algorithm')
-    search('ACM')
-    search('XML')
-    search('professor')
-    search('Terrible UTC')
-    search('professor koagiri')
-    search('terrible sunstar')
-    search('Machine Learning') 
-    search('Professor cristina lopes')
-    search('ICS')
-    search('VR')
-    search('Virtual Reality')
-    '''
+    start()
     app.run(debug=True)
